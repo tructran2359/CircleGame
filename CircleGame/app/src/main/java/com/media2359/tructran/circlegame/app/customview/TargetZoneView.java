@@ -2,14 +2,17 @@ package com.media2359.tructran.circlegame.app.customview;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.media2359.tructran.circlegame.app.R;
 import com.media2359.tructran.circlegame.app.helper.LogUtils;
 import com.media2359.tructran.circlegame.app.helper.PrefHelper;
+import com.media2359.tructran.circlegame.app.helper.UiUtils;
+import com.media2359.tructran.circlegame.app.helper.Utils;
+import com.media2359.tructran.circlegame.app.model.ModelPoint;
 
 /**
  * Created by TrucTran on 5/15/16.
@@ -19,7 +22,16 @@ public class TargetZoneView extends View {
     private float mStartAngle;
     private float mSweepAngle;
     private RectF mRectF;
+    private int mWidth;
     private int mTargetZoneWidth;
+    private int mBigRadius;
+    private int mSmallRadius;
+    private int mRadiusOfCircleAtStartAndStop;
+    private float mDecreaseAngle;
+
+    private Paint mPaintArc;
+    private Paint mPaintCircle;
+    private Paint mPaintFailedZone;
 
 
     public TargetZoneView(Context context) {
@@ -41,10 +53,20 @@ public class TargetZoneView extends View {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         if (changed) {
-            int width = getWidth();
-            int height = getHeight();
-            int offset = mTargetZoneWidth/2;
-            mRectF = new RectF(offset, offset, width - offset, height - offset);
+            mWidth = getWidth();
+            mBigRadius = mWidth / 2;
+            mRadiusOfCircleAtStartAndStop = mTargetZoneWidth / 2;
+            mSmallRadius = mBigRadius - mRadiusOfCircleAtStartAndStop;
+
+            double sinBeta = (double)mRadiusOfCircleAtStartAndStop / (double)mSmallRadius;
+            double betaInRad = Math.asin(sinBeta);
+            mDecreaseAngle = Utils.convertFromRadianToDegree((float) betaInRad);
+            LogUtils.i("TargetZone", "Beta: " + mDecreaseAngle);
+            LogUtils.i("TargetZone", "SinB: " + sinBeta);
+
+
+            int offset = mTargetZoneWidth / 2;
+            mRectF = new RectF(offset, offset, mWidth - offset, mWidth - offset);
         }
     }
 
@@ -56,13 +78,34 @@ public class TargetZoneView extends View {
             return;
         }
 
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(mTargetZoneWidth);
+        float realStartAngle = mStartAngle + mDecreaseAngle;
+        float realSweepAngle = mSweepAngle - (2 * mDecreaseAngle);
 
-        canvas.drawArc(mRectF, mStartAngle, mSweepAngle, false, paint);
+        ModelPoint pointAtStart = UiUtils.calculateCenterPoint(
+                mWidth / 2 - (mTargetZoneWidth / 2),
+                realStartAngle,
+                mWidth / 2
+        );
+        ModelPoint pointAtStop = UiUtils.calculateCenterPoint(
+                mWidth / 2 - (mTargetZoneWidth / 2),
+                realStartAngle + realSweepAngle,
+                mWidth / 2
+        );
+
+
+        canvas.drawArc(mRectF, 0, 360, false, mPaintFailedZone);
+
+        canvas.drawCircle(pointAtStart.getX(), pointAtStart.getY(), mTargetZoneWidth / 2, mPaintCircle);
+        canvas.drawCircle(pointAtStop.getX(), pointAtStop.getY(), mTargetZoneWidth / 2, mPaintCircle);
+
+        canvas.drawArc(mRectF, realStartAngle, realSweepAngle, false, mPaintArc);
+
+        Paint test = new Paint();
+        test.setStyle(Paint.Style.STROKE);
+        test.setAntiAlias(true);
+        test.setColor(getContext().getResources().getColor(R.color.yellow));
+        test.setStrokeWidth(10);
+        canvas.drawArc(mRectF, mStartAngle, mSweepAngle, true, test);
     }
 
     @Override
@@ -71,8 +114,27 @@ public class TargetZoneView extends View {
     }
 
     private void init() {
-        mTargetZoneWidth = PrefHelper.getScreenWidth() / 8;
+        mTargetZoneWidth = getTargetZoneWidth();
+
+        mPaintArc = new Paint();
+        mPaintArc.setStyle(Paint.Style.STROKE);
+        mPaintArc.setAntiAlias(true);
+        mPaintArc.setColor(getContext().getResources().getColor(R.color.blue));
+        mPaintArc.setStrokeWidth(mTargetZoneWidth);
+
+        mPaintCircle = new Paint();
+        mPaintCircle.setStyle(Paint.Style.FILL);
+        mPaintCircle.setAntiAlias(true);
+        mPaintCircle.setColor(getContext().getResources().getColor(R.color.blue));
+
+        mPaintFailedZone = new Paint();
+        mPaintFailedZone.setStyle(Paint.Style.STROKE);
+        mPaintFailedZone.setAntiAlias(true);
+        mPaintFailedZone.setColor(getContext().getResources().getColor(R.color.red));
+        mPaintFailedZone.setStrokeWidth(mTargetZoneWidth);
+
         LogUtils.i("targetzone", "Width: " + mTargetZoneWidth);
+
     }
 
     public void setArcInfo(float startAngle, float sweepAngle) {
@@ -80,4 +142,9 @@ public class TargetZoneView extends View {
         this.mSweepAngle = sweepAngle;
         invalidate();
     }
+
+    public static int getTargetZoneWidth() {
+        return PrefHelper.getScreenWidth() / 8;
+    }
+
 }

@@ -25,4 +25,20 @@ public class Utils {
         return text == null ? "null" : text.isEmpty() ? "empty" : text;
     }
 
+    /**
+     * Convert from degree to radians
+     * 180 (degree) = PI (radians)
+     * <=> 1 (degree) = PI / 180 (radians)
+     * <=> X (degree) = X * PI / 180
+     * @param degree
+     * @return
+     */
+    public static float convertFromDegreeToRadian(float degree) {
+        return (float) (degree * Math.PI / 180);
+    }
+
+    public static float convertFromRadianToDegree(float radian) {
+        return (float) (radian * 180 / Math.PI);
+    }
+
 }
