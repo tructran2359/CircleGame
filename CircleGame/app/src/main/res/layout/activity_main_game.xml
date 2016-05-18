@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.media2359.tructran.circlegame.app.MainGameActivity"
+    android:padding="@dimen/common_space">
+
+    <com.media2359.tructran.circlegame.app.customview.TargetZoneView
+        android:id="@+id/main_game_act_target_zone_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>
