@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.media2359.tructran.circlegame.app.R;
 import com.media2359.tructran.circlegame.app.helper.UiUtils;
+import com.media2359.tructran.circlegame.app.helper.Utils;
 import com.media2359.tructran.circlegame.app.model.ModelPoint;
 
 /**
@@ -19,10 +20,11 @@ public class MainRunView extends View {
     //x = R cos(alpha)
     //y = R sin(alpha)
 
-    private float mAngle;
+    private float mAngleInDegree;
     private int mRadiusCircleView;
     private int mRadiusWholeView;
     private int mRadiusCenterRunView;
+    private int mPaddingToTargetZone;
 
     private RectF mRectF;
     private Paint mPaintRunCircle;
@@ -63,7 +65,7 @@ public class MainRunView extends View {
             mRectF = new RectF(1, 1, width-1, width-1);
 
             mRadiusWholeView = width / 2;
-            mRadiusCenterRunView = mRadiusWholeView - mRadiusCircleView;
+            mRadiusCenterRunView = mRadiusWholeView - mRadiusCircleView - mPaddingToTargetZone;
         }
     }
 
@@ -75,17 +77,20 @@ public class MainRunView extends View {
             return;
         }
 
-        ModelPoint point = UiUtils.calculateCenterPoint(mRadiusCenterRunView, mAngle, mRadiusWholeView);
+        ModelPoint point = UiUtils.calculateCenterPoint(mRadiusCenterRunView, mAngleInDegree, mRadiusWholeView);
         canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView, mPaintRunCircle);
-        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView / 10, mPaintCenter);
+        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView / 20, mPaintCenter);
     }
 
 
     // Additional methods ==============================
 
     private void init() {
-        mAngle = 0;
-        mRadiusCircleView = TargetZoneView.getTargetZoneWidth() / 2;
+        mAngleInDegree = 0;
+        int targetZoneWidth = TargetZoneView.getTargetZoneWidth();
+
+        mRadiusCircleView = (int) (( targetZoneWidth * 0.8) / 2) ;
+        mPaddingToTargetZone = targetZoneWidth / 2 - mRadiusCircleView;
 
         mPaintRunCircle = new Paint();
         mPaintRunCircle.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -103,12 +108,12 @@ public class MainRunView extends View {
         mPaintCenter.setColor(getContext().getResources().getColor(R.color.bg_run_circle_center));
     }
 
-    public float getAngle() {
-        return mAngle;
+    public float getAngleInDegree() {
+        return Utils.getRealDegree(mAngleInDegree);
     }
 
-    public void setAngle(float angle) {
-        mAngle = angle;
+    public void setAngleInDegree(float angleInDegree) {
+        mAngleInDegree = Utils.getRealDegree(angleInDegree);
         invalidate();
     }
 }

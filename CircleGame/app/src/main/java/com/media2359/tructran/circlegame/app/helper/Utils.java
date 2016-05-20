@@ -41,4 +41,15 @@ public class Utils {
         return (float) (radian * 180 / Math.PI);
     }
 
+    public static float getRealDegree(float degree) {
+        if (degree < 360) {
+            return degree;
+        }
+
+        while (degree > 360) {
+            degree -= 360;
+        }
+        return degree;
+    }
+
 }

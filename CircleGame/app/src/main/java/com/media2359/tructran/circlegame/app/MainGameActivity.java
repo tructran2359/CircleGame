@@ -3,28 +3,20 @@ package com.media2359.tructran.circlegame.app;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
-import android.widget.TextView;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.RelativeLayout;
 
+import com.media2359.tructran.circlegame.app.controller.GameController;
 import com.media2359.tructran.circlegame.app.customview.MainRunView;
 import com.media2359.tructran.circlegame.app.customview.TargetZoneView;
+import com.media2359.tructran.circlegame.app.helper.ConstantHelper;
+import com.media2359.tructran.circlegame.app.helper.Utils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class MainGameActivity extends AppCompatActivity {
-
-    public static final int WHAT_SIMULATE = 1;
-    public static final long MAX_SIMULATE_DURATION_IN_MILLIS = 10 * 1000;
-    public static final int NUMBER_OF_FRAME_PER_SECOND = 60;
-    public static final long INTERVAL_SIMULATE_IN_MILLIS = 1000 / NUMBER_OF_FRAME_PER_SECOND;
-    public static final float SPEED_DEGREE_PER_SECOND = 100f;
-    public static final float SPEED_PER_FRAME = SPEED_DEGREE_PER_SECOND / NUMBER_OF_FRAME_PER_SECOND;
-
-    private static final float SPEED_MAX = 500f;
-    private static final float SPEED_MIN = 10f;
-    private static final float SPEED_OFFSET = 30f;
+public class MainGameActivity extends AppCompatActivity implements GameController.OnScreenTouchListener {
 
     @Bind(R.id.act_main_game_target_zone_view)
     TargetZoneView mTargetZoneView;
@@ -32,18 +24,14 @@ public class MainGameActivity extends AppCompatActivity {
     @Bind(R.id.act_main_game_run_view)
     MainRunView mMainRunView;
 
-    @Bind(R.id.act_main_game_tv_countdown)
-    TextView mTvCountDown;
-
-    @Bind(R.id.act_main_game_btn_start)
-    Button mBtnStart;
+    @Bind(R.id.act_main_game_rl_root)
+    RelativeLayout mRlRoot;
 
     private CountDownTimer mCountDownTimer;
-    private long mTimeDebug = 0;
+    private GameController mGameController;
 
-    private boolean mIsTimerRunning;
-
-    private float mCurrentSpeed;
+    private boolean mIsTouchedDown;
+    private boolean mIsGameRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +47,16 @@ public class MainGameActivity extends AppCompatActivity {
 
     private void init() {
         mTargetZoneView.setArcInfo(0, 120);
-        mMainRunView.setAngle(270f);
-        mIsTimerRunning = false;
-        mCurrentSpeed = SPEED_DEGREE_PER_SECOND;
-        mTvCountDown.setText("Speed: " + mCurrentSpeed);
-        mCountDownTimer = new CountDownTimer(MAX_SIMULATE_DURATION_IN_MILLIS, INTERVAL_SIMULATE_IN_MILLIS) {
+        mMainRunView.setAngleInDegree(270f);
+        mGameController = GameController.getInstance();
+        mGameController.setOnScreenTouchListener(this);
+        mIsTouchedDown = false;
+        mRlRoot.setOnTouchListener(mOntouchListener);
+
+        mCountDownTimer = new CountDownTimer(ConstantHelper.MAX_SIMULATE_DURATION_IN_MILLIS, ConstantHelper.INTERVAL_SIMULATE_IN_MILLIS) {
             @Override
             public void onTick(long l) {
-                mMainRunView.setAngle(mMainRunView.getAngle() + (mCurrentSpeed / NUMBER_OF_FRAME_PER_SECOND));
+                mMainRunView.setAngleInDegree(mMainRunView.getAngleInDegree() + (mGameController.getSpeed() / ConstantHelper.NUMBER_OF_FRAME_PER_SECOND));
             }
 
             @Override
@@ -77,35 +67,50 @@ public class MainGameActivity extends AppCompatActivity {
     }
 
     // Listeners ===========================================
+    View.OnTouchListener mOntouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            int action = motionEvent.getAction();
+            if (action == MotionEvent.ACTION_DOWN) {
+                if (mIsTouchedDown) {
+                    return false;
+                } else {
+                    mIsTouchedDown = true;
+                    if (!mIsGameRunning) {
+                        //start game if game is not running
+                        mCountDownTimer.start();
+                        mIsGameRunning = true;
+                        return true;
+                    }
 
-    @OnClick(R.id.act_main_game_btn_start)
-    public void onStartClicked() {
-        if (mIsTimerRunning) {
-            mCountDownTimer.cancel();
-            mIsTimerRunning = false;
-            mBtnStart.setText("START");
-        } else {
-            mCountDownTimer.start();
-            mIsTimerRunning = true;
-            mBtnStart.setText("STOP");
+                    float angleRunView = mMainRunView.getAngleInDegree();
+                    float targetZoneStartAngle = mTargetZoneView.getStartAngle();
+                    float targetZoneSweepAngle = mTargetZoneView.getSweepAngle();
+
+                    mGameController.onScreenTouch(angleRunView, targetZoneStartAngle, targetZoneSweepAngle);
+                    return true;
+                }
+            } else {
+                mIsTouchedDown = false;
+                return true;
+            }
         }
+    };
+
+
+    @Override
+    public void onTouchSuccess() {
+        Utils.showToast(this, "Nice!");
+        mGameController.increaseSpeed();
     }
 
-    @OnClick(R.id.act_main_game_btn_increase)
-    public void onIncreseClicked() {
-        mCurrentSpeed += SPEED_OFFSET;
-        if (mCurrentSpeed > SPEED_MAX) {
-            mCurrentSpeed = SPEED_MAX;
-        }
-        mTvCountDown.setText("Speed: " + mCurrentSpeed);
-    }
+    @Override
+    public void onTouchFailed(float angleRunView, float targetZoneStartAngle, float targetZoneSweepAngle) {
+        mTargetZoneView.setArcInfo(targetZoneStartAngle, targetZoneSweepAngle);
+        mMainRunView.setAngleInDegree(angleRunView);
+        mCountDownTimer.cancel();
+        mIsGameRunning = false;
 
-    @OnClick(R.id.act_main_game_btn_decrease)
-    public void onDecreaseClicked() {
-        mCurrentSpeed -= SPEED_OFFSET;
-        if (mCurrentSpeed < SPEED_MIN) {
-            mCurrentSpeed = SPEED_MIN;
-        }
-        mTvCountDown.setText("Speed: " + mCurrentSpeed);
+        Utils.showToast(this, "Failed!");
     }
 }

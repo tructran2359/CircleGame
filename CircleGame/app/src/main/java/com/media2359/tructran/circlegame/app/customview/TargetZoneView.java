@@ -100,12 +100,13 @@ public class TargetZoneView extends View {
 
         canvas.drawArc(mRectF, realStartAngle, realSweepAngle, false, mPaintArc);
 
-        Paint test = new Paint();
-        test.setStyle(Paint.Style.STROKE);
-        test.setAntiAlias(true);
-        test.setColor(getContext().getResources().getColor(R.color.yellow));
-        test.setStrokeWidth(10);
-        canvas.drawArc(mRectF, mStartAngle, mSweepAngle, true, test);
+        //for testing the range of target zone
+//        Paint test = new Paint();
+//        test.setStyle(Paint.Style.STROKE);
+//        test.setAntiAlias(true);
+//        test.setColor(getContext().getResources().getColor(R.color.yellow));
+//        test.setStrokeWidth(10);
+//        canvas.drawArc(mRectF, mStartAngle, mSweepAngle, true, test);
     }
 
     @Override
@@ -141,6 +142,14 @@ public class TargetZoneView extends View {
         this.mStartAngle = startAngle;
         this.mSweepAngle = sweepAngle;
         invalidate();
+    }
+
+    public float getStartAngle() {
+        return mStartAngle;
+    }
+
+    public float getSweepAngle() {
+        return mSweepAngle;
     }
 
     public static int getTargetZoneWidth() {

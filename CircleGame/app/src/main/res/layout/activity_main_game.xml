@@ -5,31 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.media2359.tructran.circlegame.app.MainGameActivity"
-    android:padding="@dimen/common_space">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentTop="true">
-
-        <Button
-            android:id="@+id/act_main_game_btn_decrease"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="-"/>
-
-        <Button
-            android:id="@+id/act_main_game_btn_increase"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+"/>
-
-    </LinearLayout>
+    android:padding="@dimen/common_space"
+    android:id="@+id/act_main_game_rl_root">
 
     <RelativeLayout
+        android:id="@+id/act_main_game_rl_game_views"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true">
@@ -44,19 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
 
-        <TextView
-            android:id="@+id/act_main_game_tv_countdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
-
     </RelativeLayout>
-
-    <Button
-        android:id="@+id/act_main_game_btn_start"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="START"/>
 
 </RelativeLayout>
