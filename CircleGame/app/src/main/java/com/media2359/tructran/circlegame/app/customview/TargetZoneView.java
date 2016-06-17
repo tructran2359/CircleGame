@@ -93,7 +93,7 @@ public class TargetZoneView extends View {
         );
 
 
-        canvas.drawArc(mRectF, 0, 360, false, mPaintFailedZone);
+//        canvas.drawArc(mRectF, 0, 360, false, mPaintFailedZone);
 
         canvas.drawCircle(pointAtStart.getX(), pointAtStart.getY(), mTargetZoneWidth / 2, mPaintCircle);
         canvas.drawCircle(pointAtStop.getX(), pointAtStop.getY(), mTargetZoneWidth / 2, mPaintCircle);

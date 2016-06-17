@@ -8,6 +8,69 @@
     android:padding="@dimen/common_space"
     android:id="@+id/act_main_game_rl_root">
 
+    <LinearLayout
+        android:id="@+id/act_main_game_ll_group_level_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/act_main_game_v_level_1"
+            style="@style/act_main_game_level_indicator"
+            android:layout_marginRight="@dimen/common_space"/>
+
+        <View
+            android:id="@+id/act_main_game_v_level_2"
+            style="@style/act_main_game_level_indicator"
+            android:layout_marginRight="@dimen/common_space"/>
+
+        <View
+            android:id="@+id/act_main_game_v_level_3"
+            style="@style/act_main_game_level_indicator"
+            android:layout_marginRight="@dimen/common_space"/>
+
+        <View
+            android:id="@+id/act_main_game_v_level_4"
+            style="@style/act_main_game_level_indicator"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/act_main_game_rl_group_game_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/act_main_game_ll_group_level_indicator"
+        android:layout_marginTop="@dimen/common_space">
+
+        <TextView
+            android:id="@+id/act_main_game_tv_label_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/label_level"/>
+
+        <TextView
+            android:id="@+id/act_main_game_tv_level"
+            android:layout_width="@dimen/label_score_level_width"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/act_main_game_tv_label_level"
+            android:layout_marginLeft="@dimen/common_space"/>
+
+        <TextView
+            android:id="@+id/act_main_game_tv_label_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/act_main_game_tv_score"
+            android:text="@string/label_score"/>
+
+        <TextView
+            android:id="@+id/act_main_game_tv_score"
+            android:layout_width="@dimen/label_score_level_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/common_space"/>
+
+    </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/act_main_game_rl_game_views"
         android:layout_width="wrap_content"

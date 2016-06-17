@@ -3,4 +3,8 @@
 
     <!-- splash screen -->
     <string name="splash_act_footage">Typed by TRUC TRAN</string>
+
+    <!-- main game screen -->
+    <string name="label_level">Level: </string>
+    <string name="label_score">Score: </string>
 </resources>

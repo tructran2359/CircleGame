@@ -13,4 +13,11 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="act_main_game_level_indicator">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/common_space_x2</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_level_indicator</item>
+    </style>
+
 </resources>
