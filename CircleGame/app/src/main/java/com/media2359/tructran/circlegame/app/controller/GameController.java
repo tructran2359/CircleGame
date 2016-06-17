@@ -99,7 +99,7 @@ public class GameController {
             return;
         }
 
-        boolean isInTargetZone =isInTargetZone(mRunAngle, mTargetZoneStartAngle, mTargetZoneSweepAngle);
+        boolean isInTargetZone = isInTargetZone(mRunAngle, mTargetZoneStartAngle, mTargetZoneSweepAngle);
         if (isInTargetZone) {
             handleTouchSuccess();
         } else {
@@ -220,6 +220,7 @@ public class GameController {
             mIsGameRunning = true;
             mListener.onGameUpdate(mRunAngle);
             mListener.onTargetZoneUpdate(mTargetZoneStartAngle, mTargetZoneSweepAngle);
+            mListener.onTouchSuccess(mScore, mLevel, mSuccessCount);
             mCountDownTimer.start();
         }
     }

@@ -7,7 +7,7 @@
 
     <dimen name="target_zone_width">200dp</dimen>
 
-    <dimen name="level_indicator_troke_width">1dp</dimen>
+    <dimen name="level_indicator_stroke_width">1dp</dimen>
     <dimen name="label_score_level_width">50dp</dimen>
 
 </resources>

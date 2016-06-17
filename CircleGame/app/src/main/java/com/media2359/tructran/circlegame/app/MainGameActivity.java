@@ -76,41 +76,33 @@ public class MainGameActivity extends AppCompatActivity implements GameControlle
 
     }
 
+    private void setSelection(boolean v1, boolean v2, boolean v3, boolean v4) {
+        mVLevel1.setSelected(v1);
+        mVLevel2.setSelected(v2);
+        mVLevel3.setSelected(v3);
+        mVLevel4.setSelected(v4);
+    }
+
     private void showCurrentLevel(int level) {
         switch (level) {
             case 0:
-                mVLevel1.setSelected(false);
-                mVLevel2.setSelected(false);
-                mVLevel3.setSelected(false);
-                mVLevel4.setSelected(false);
+                setSelection(false, false, false, false);
                 break;
 
             case 1:
-                mVLevel1.setSelected(true);
-                mVLevel2.setSelected(false);
-                mVLevel3.setSelected(false);
-                mVLevel4.setSelected(false);
+                setSelection(true, false, false, false);
                 break;
 
             case 2:
-                mVLevel1.setSelected(true);
-                mVLevel2.setSelected(true);
-                mVLevel3.setSelected(false);
-                mVLevel4.setSelected(false);
+                setSelection(true, true, false, false);
                 break;
 
             case 3:
-                mVLevel1.setSelected(true);
-                mVLevel2.setSelected(true);
-                mVLevel3.setSelected(true);
-                mVLevel4.setSelected(false);
+                setSelection(true, true, true, false);
                 break;
 
             case 4:
-                mVLevel1.setSelected(true);
-                mVLevel2.setSelected(true);
-                mVLevel3.setSelected(true);
-                mVLevel4.setSelected(true);
+                setSelection(true, true, true, true);
                 break;
         }
     }
