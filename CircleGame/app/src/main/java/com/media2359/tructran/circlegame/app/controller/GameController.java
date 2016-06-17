@@ -16,7 +16,7 @@ public class GameController {
     public static final float SPEED_START = 70f;
     public static final int SCORE_EACH_LEVEL = 10;
     public static final float DEFAULT_RUN_ANGLE = 0f;
-    public static final float DEFAULT_TARGET_ZONE_START_ANGLE = 60f;
+    public static final float DEFAULT_TARGET_ZONE_START_ANGLE = 150f;
     public static final float DEFAULT_TARGET_ZONE_SWEEP_ANGLE = 60f;
     public static final long COUNT_DOWN_DURATION_IN_MILLIS = 30 * 1000;
     public static final int NUMBER_OF_FRAME_PER_SECOND = 60;

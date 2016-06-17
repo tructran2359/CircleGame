@@ -25,7 +25,7 @@ public class TargetZoneView extends View {
     private int mWidth;
     private int mTargetZoneWidth;
     private int mBigRadius;
-    private int mSmallRadius;
+    private int mRadiusCenterOfArc;
     private int mRadiusOfCircleAtStartAndStop;
     private float mDecreaseAngle;
 
@@ -55,18 +55,24 @@ public class TargetZoneView extends View {
         if (changed) {
             mWidth = getWidth();
             mBigRadius = mWidth / 2;
-            mRadiusOfCircleAtStartAndStop = mTargetZoneWidth / 2;
-            mSmallRadius = mBigRadius - mRadiusOfCircleAtStartAndStop;
 
-            double sinBeta = (double)mRadiusOfCircleAtStartAndStop / (double)mSmallRadius;
+            // need to + 1 because if not, UI will has a bug which has a extra line at point arc touch the bound
+            mRadiusOfCircleAtStartAndStop = mTargetZoneWidth / 2 + 1;
+
+            mRadiusCenterOfArc = mBigRadius - mRadiusOfCircleAtStartAndStop;
+
+            double sinBeta = (double)mRadiusOfCircleAtStartAndStop / (double) mRadiusCenterOfArc;
             double betaInRad = Math.asin(sinBeta);
             mDecreaseAngle = Utils.convertFromRadianToDegree((float) betaInRad);
             LogUtils.i("TargetZone", "Beta: " + mDecreaseAngle);
             LogUtils.i("TargetZone", "SinB: " + sinBeta);
 
 
-            int offset = mTargetZoneWidth / 2;
-            mRectF = new RectF(offset, offset, mWidth - offset, mWidth - offset);
+            mRectF = new RectF(
+                    mRadiusOfCircleAtStartAndStop,
+                    mRadiusOfCircleAtStartAndStop,
+                    mWidth - mRadiusOfCircleAtStartAndStop,
+                    mWidth - mRadiusOfCircleAtStartAndStop);
         }
     }
 
@@ -82,14 +88,14 @@ public class TargetZoneView extends View {
         float realSweepAngle = mSweepAngle - (2 * mDecreaseAngle);
 
         ModelPoint pointAtStart = UiUtils.calculateCenterPoint(
-                mWidth / 2 - (mTargetZoneWidth / 2),
+                mRadiusCenterOfArc,
                 realStartAngle,
-                mWidth / 2
+                mBigRadius
         );
         ModelPoint pointAtStop = UiUtils.calculateCenterPoint(
-                mWidth / 2 - (mTargetZoneWidth / 2),
+                mRadiusCenterOfArc,
                 realStartAngle + realSweepAngle,
-                mWidth / 2
+                mBigRadius
         );
 
 
@@ -120,7 +126,7 @@ public class TargetZoneView extends View {
         mPaintArc = new Paint();
         mPaintArc.setStyle(Paint.Style.STROKE);
         mPaintArc.setAntiAlias(true);
-        mPaintArc.setColor(getContext().getResources().getColor(R.color.blue));
+        mPaintArc.setColor(getContext().getResources().getColor(R.color.red));
         mPaintArc.setStrokeWidth(mTargetZoneWidth);
 
         mPaintCircle = new Paint();
