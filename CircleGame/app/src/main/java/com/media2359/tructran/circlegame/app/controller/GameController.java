@@ -22,7 +22,7 @@ public class GameController {
     public static final int NUMBER_OF_FRAME_PER_SECOND = 60;
     public static final long COUNT_DOWN_INTERVAL_IN_MILLIS = 1000 / NUMBER_OF_FRAME_PER_SECOND;
     public static final float TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE = 60f;
-    public static final float TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE = 270f;
+    public static final float TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE = 180f;
 
 
     private int mScore;
