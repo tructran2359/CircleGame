@@ -16,13 +16,15 @@ public class GameController {
     public static final float SPEED_START = 70f;
     public static final int SCORE_EACH_LEVEL = 10;
     public static final float DEFAULT_RUN_ANGLE = 0f;
-    public static final float DEFAULT_TARGET_ZONE_START_ANGLE = 150f;
+    public static final float DEFAULT_TARGET_ZONE_START_ANGLE = 60f;
     public static final float DEFAULT_TARGET_ZONE_SWEEP_ANGLE = 60f;
     public static final long COUNT_DOWN_DURATION_IN_MILLIS = 30 * 1000;
     public static final int NUMBER_OF_FRAME_PER_SECOND = 60;
     public static final long COUNT_DOWN_INTERVAL_IN_MILLIS = 1000 / NUMBER_OF_FRAME_PER_SECOND;
     public static final float TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE = 60f;
     public static final float TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE = 180f;
+    public static final float TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE = (TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE + TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE) / 2;
+    public static final float EXTRA_DISTANCE_TO_CHANGE_NEW_ARC_POS_IN_DEGREE = 90f;
 
 
     private int mScore;
@@ -32,6 +34,8 @@ public class GameController {
     private float mRunAngle;
     private float mTargetZoneStartAngle;
     private float mTargetZoneSweepAngle;
+    private float mTargetZonePrevStartAngle;
+    private float mTargetZonePrevSweepAngle;
     private boolean mIsGameRunning;
     private CountDownTimer mCountDownTimer;
     private Random mRandom;
@@ -59,6 +63,8 @@ public class GameController {
         mRunAngle = DEFAULT_RUN_ANGLE;
         mTargetZoneStartAngle = DEFAULT_TARGET_ZONE_START_ANGLE;
         mTargetZoneSweepAngle = DEFAULT_TARGET_ZONE_SWEEP_ANGLE;
+        mTargetZonePrevStartAngle = -1;
+        mTargetZonePrevSweepAngle = -1;
         mIsGameRunning = false;
         initCountDownTimer();
     }
@@ -68,7 +74,7 @@ public class GameController {
             @Override
             public void onTick(long l) {
                 if (mListener != null) {
-                    mRunAngle = Utils.getRealDegree(mRunAngle + mCurrentSpeed / NUMBER_OF_FRAME_PER_SECOND);
+                    mRunAngle = Utils.standardizeAngle(mRunAngle + mCurrentSpeed / NUMBER_OF_FRAME_PER_SECOND);
                     mListener.onGameUpdate(mRunAngle);
                 }
 
@@ -133,6 +139,7 @@ public class GameController {
 
     private void handleTouchFailed(float angleRunView, float targetZoneStartAngle, float targetZoneSweepAngle) {
         stopGame();
+        LogUtils.i("GameFailed", "GameController handleTouchFailed : angle: " + angleRunView + " start: " + targetZoneStartAngle + " sweep: " + targetZoneSweepAngle);
         mListener.onTouchFailed(angleRunView, targetZoneStartAngle, targetZoneSweepAngle);
     }
 
@@ -213,6 +220,11 @@ public class GameController {
         mIsGameRunning = gameRunning;
     }
 
+    public boolean isInsideTheArc(float angle, float arcStartAngle, float arcSweepAngle) {
+        float arcEndAngle = arcStartAngle + arcSweepAngle;
+        return angle >= arcStartAngle && angle <= arcEndAngle;
+    }
+
     // game control ==============================================================
 
     private void startGame() {
@@ -234,9 +246,51 @@ public class GameController {
 
     private void generateNewTargetZone() {
         if (mListener != null) {
+            mTargetZonePrevStartAngle = mTargetZoneStartAngle;
+            mTargetZonePrevSweepAngle = mTargetZoneSweepAngle;
+
             mTargetZoneStartAngle = Math.abs(mRandom.nextInt(360));
             mTargetZoneSweepAngle = Math.abs(mRandom.nextInt((int)TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE - (int)TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE) + TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE);
-            LogUtils.i("Game", "GameController generateNewTargetZone start: " + mTargetZoneStartAngle + " sweep: " + mTargetZoneSweepAngle);
+
+            //check the size of arc should generate big different arc.
+            // If prev arc size is smaller than mid -> next should be larger and otherwise
+
+            if (mTargetZonePrevSweepAngle < TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE
+                    && mTargetZoneSweepAngle < TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE) {
+
+                mTargetZoneSweepAngle += TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE - TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE;
+
+            } else if (mTargetZonePrevSweepAngle > TARGET_ZONE_MIN_SWEEP_ANGLE_IN_DEGREE
+                    && mTargetZoneSweepAngle > TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE) {
+
+                mTargetZoneSweepAngle -= TARGET_ZONE_MAX_SWEEP_ANGLE_IN_DEGREE - TARGET_ZONE_MID_SWEEP_ANGLE_IN_DEGREE;
+
+            }
+
+            //check new start angle of arc. new arc should now overlap the previous one
+            float prevEndAngle = mTargetZonePrevStartAngle + mTargetZonePrevSweepAngle;
+            float newEndAngle = mTargetZoneStartAngle + mTargetZoneSweepAngle;
+            while (
+                       (isInsideTheArc( mTargetZoneStartAngle,      mTargetZonePrevStartAngle,  mTargetZonePrevSweepAngle))     /* start point of new arc is inside old arc */
+                    || (isInsideTheArc( newEndAngle,                mTargetZonePrevStartAngle,  mTargetZonePrevSweepAngle))     /* end point of new arc is inside old arc */
+                    || (isInsideTheArc( mTargetZonePrevStartAngle,  mTargetZoneStartAngle,      mTargetZoneSweepAngle))         /* start point of old arc is inside new arc */
+                    || (isInsideTheArc( prevEndAngle,               mTargetZoneStartAngle,      mTargetZoneSweepAngle))         /* start point of old arc is inside new arc */
+               )
+            {
+                prevEndAngle = mTargetZonePrevStartAngle + mTargetZonePrevSweepAngle;
+                newEndAngle = mTargetZoneStartAngle + mTargetZoneSweepAngle;
+                int multiplier = mRandom.nextInt(2);
+                if (multiplier == 0) {
+                    mTargetZoneStartAngle +=  EXTRA_DISTANCE_TO_CHANGE_NEW_ARC_POS_IN_DEGREE;
+                } else {
+                    mTargetZoneStartAngle -= EXTRA_DISTANCE_TO_CHANGE_NEW_ARC_POS_IN_DEGREE;
+                }
+            }
+
+            mTargetZoneStartAngle = Utils.standardizeAngle(mTargetZoneStartAngle);
+            mTargetZoneSweepAngle = Utils.standardizeAngle(mTargetZoneSweepAngle);
+
+//            LogUtils.i("Game", "GameController generateNewTargetZone start: " + mTargetZoneStartAngle + " sweep: " + mTargetZoneSweepAngle);
             mListener.onTargetZoneUpdate(mTargetZoneStartAngle, mTargetZoneSweepAngle);
         }
     }

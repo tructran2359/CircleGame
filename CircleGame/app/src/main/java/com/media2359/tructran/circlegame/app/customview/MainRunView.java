@@ -109,11 +109,11 @@ public class MainRunView extends View {
     }
 
     public float getAngleInDegree() {
-        return Utils.getRealDegree(mAngleInDegree);
+        return Utils.standardizeAngle(mAngleInDegree);
     }
 
     public void setAngleInDegree(float angleInDegree) {
-        mAngleInDegree = Utils.getRealDegree(angleInDegree);
+        mAngleInDegree = Utils.standardizeAngle(angleInDegree);
         invalidate();
     }
 }

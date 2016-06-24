@@ -57,7 +57,7 @@ public class TargetZoneView extends View {
             mBigRadius = mWidth / 2;
 
             // need to + 1 because if not, UI will has a bug which has a extra line at point arc touch the bound
-            mRadiusOfCircleAtStartAndStop = mTargetZoneWidth / 2;
+            mRadiusOfCircleAtStartAndStop = mTargetZoneWidth / 2 + 1;
 
             mRadiusCenterOfArc = mBigRadius - mRadiusOfCircleAtStartAndStop;
 
