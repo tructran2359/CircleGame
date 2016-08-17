@@ -1,13 +1,14 @@
 package com.media2359.tructran.circlegame.app.customview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.media2359.tructran.circlegame.app.R;
+import com.media2359.tructran.circlegame.app.helper.LogUtils;
 import com.media2359.tructran.circlegame.app.helper.UiUtils;
 import com.media2359.tructran.circlegame.app.helper.Utils;
 import com.media2359.tructran.circlegame.app.model.ModelPoint;
@@ -26,26 +27,28 @@ public class MainRunView extends View {
     private int mRadiusCenterRunView;
     private int mPaddingToTargetZone;
 
-    private RectF mRectF;
     private Paint mPaintRunCircle;
     private Paint mPaintBorderCircle;
     private Paint mPaintCenter;
+    private Paint mPaintBitmap;
+
+    private Bitmap mBitmap;
 
     // Constructor =====================================
 
     public MainRunView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public MainRunView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public MainRunView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
     // Override methods ===============================
@@ -62,10 +65,15 @@ public class MainRunView extends View {
         if (changed) {
             int width = getWidth();
 
-            mRectF = new RectF(1, 1, width-1, width-1);
-
             mRadiusWholeView = width / 2;
             mRadiusCenterRunView = mRadiusWholeView - mRadiusCircleView - mPaddingToTargetZone;
+
+            Bitmap bmp = UiUtils.getSmallestScaledBitmapThatStillLargerThanRequirementFromResource(getContext().getResources(), R.drawable.ic_test, mRadiusCircleView, mRadiusCircleView);
+            mBitmap = Bitmap.createScaledBitmap(bmp, mRadiusCircleView * 2, mRadiusCircleView * 2, true);
+            LogUtils.i("Bug", "mRadiusCenterRunView: " + mRadiusCircleView);
+            LogUtils.i("Bug", "Bitmap loaded: " + bmp.getWidth());
+            LogUtils.i("Bug", "Scaled: " + mBitmap.getWidth());
+            bmp.recycle();
         }
     }
 
@@ -73,19 +81,28 @@ public class MainRunView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mRadiusWholeView == 0) {
+        if (mRadiusWholeView == 0 || getContext() == null) {
             return;
         }
 
-        ModelPoint point = UiUtils.calculateCenterPoint(mRadiusCenterRunView, mAngleInDegree, mRadiusWholeView);
-        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView, mPaintRunCircle);
-        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView / 20, mPaintCenter);
+        ModelPoint point = UiUtils.calculateCenterPoint(
+                mRadiusCenterRunView,
+                mAngleInDegree,
+                mRadiusWholeView);
+
+//        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView, mPaintRunCircle);
+//        canvas.drawCircle(point.getX(), point.getY(), mRadiusCircleView / 20, mPaintCenter);
+
+
+        float left = point.getX() - mRadiusCircleView;
+        float top = point.getY() - mRadiusCircleView;
+        canvas.drawBitmap(mBitmap, left, top, mPaintBitmap);
     }
 
 
     // Additional methods ==============================
 
-    private void init() {
+    private void init(Context context) {
         mAngleInDegree = 0;
         int targetZoneWidth = TargetZoneView.getTargetZoneWidth();
 
@@ -106,6 +123,9 @@ public class MainRunView extends View {
         mPaintCenter.setStyle(Paint.Style.FILL);
         mPaintCenter.setAntiAlias(true);
         mPaintCenter.setColor(getContext().getResources().getColor(R.color.bg_run_circle_center));
+
+        mPaintBitmap = new Paint();
+        mPaintBitmap.setAntiAlias(true);
     }
 
     public float getAngleInDegree() {
