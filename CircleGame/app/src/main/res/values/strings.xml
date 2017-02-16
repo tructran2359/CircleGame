@@ -2,9 +2,13 @@
     <string name="app_name">Circle</string>
 
     <!-- splash screen -->
-    <string name="splash_act_footage">Typed by TRUC TRAN</string>
+    <string name="splash_act_footage">Just a simple game</string>
 
     <!-- main game screen -->
     <string name="label_level">Level: </string>
     <string name="label_score">Score: </string>
+
+    <string name="game_over">Game Over!!!</string>
+    <string name="result_message">You got %1$s point(s) at level %2$s</string>
+    <string name="touch_to_start_new_game">Touch the screen to start new game.</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.media2359.tructran.circlegame.app;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -142,7 +144,20 @@ public class MainGameActivity extends AppCompatActivity implements GameControlle
         mTargetZoneView.setArcInfo(targetZoneStartAngle, targetZoneSweepAngle);
         mMainRunView.setAngleInDegree(angleRunView);
 
-        Utils.showToast(this, "Failed!");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.game_over);
+        String result = getString(R.string.result_message);
+        String score = mGameController.getScore() + "";
+        String level = mGameController.getLevel() + "";
+        builder.setMessage(String.format(result, score, level));
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Utils.showToast(MainGameActivity.this, getString(R.string.touch_to_start_new_game));
+            }
+        });
+        builder.show();
     }
 
     @Override

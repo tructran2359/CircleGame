@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
+        android:src="@mipmap/icon_circle"
         android:layout_centerInParent="true"/>
 
     <TextView
@@ -17,5 +17,6 @@
         android:layout_height="wrap_content"
         android:text="@string/splash_act_footage"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/common_space_x3"/>
 </RelativeLayout>
