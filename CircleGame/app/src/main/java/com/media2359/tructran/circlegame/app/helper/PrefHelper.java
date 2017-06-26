@@ -13,7 +13,7 @@ public class PrefHelper {
     public static final String PREF_SCREEN_WIDTH = "PrefScreenWidth";
     public static final String PREF_SCREEN_HEIGHT = "PrefScreenHeight";
 
-    private static SharedPreferences mSharedPref = CircleGameApplication.getinstance().getSharedPreferences(CIRCLE_GAME_PREF_NAME, 0);
+    private static SharedPreferences mSharedPref = CircleGameApplication.getInstance().getSharedPreferences(CIRCLE_GAME_PREF_NAME, 0);
 
     private static void putBoolean(String key, boolean value) {
         mSharedPref.edit().putBoolean(key, value).apply();

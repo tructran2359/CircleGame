@@ -9,7 +9,7 @@ public class CircleGameApplication extends Application {
 
     private static CircleGameApplication mInstance;
 
-    public static CircleGameApplication getinstance() {
+    public static CircleGameApplication getInstance() {
         return mInstance;
     }
 
